@@ -44,41 +44,38 @@ def require_login():
 
 @app.route('/blog')
 def blog_list():
-    return render_template('blog.html', title="Blogz")
+    return render_template('blog.html', title="Blogz - All Posts")
 
 
-@app.route('/newpost')
+@app.route('/newpost', methods=['POST', 'GET'])
 def newpost():
+    if request.method == 'GET':
+        return render_template('newpost.html', title="Blogz - New Post")
+
     return render_template('newpost.html', title="Blogz - New Post")
 
 
-@app.route('/newpost', methods=['POST'])
-def newpost_post():
-    return render_template('newpost.html', title="Blogz - New Post")
-
-
-@app.route('/login')
+@app.route('/login', methods=['POST', 'GET'])
 def login():
+    if request.method == 'GET':
+        return render_template('login.html', title="Blogz - Login")
+
+    flash('Error msg test', 'error')
     return render_template('login.html', title="Blogz - Login")
 
 
-@app.route('/login', methods=['POST'])
-def login_post():
-    return render_template('login.html', title="Blogz - Login")
-
-
-@app.route('/signup')
+@app.route('/signup', methods=['POST', 'GET'])
 def signup():
-    return render_template('signup.html', title="Blogz - Signup")
+    if request.method == 'GET':
+        return render_template('signup.html', title="Blogz - Signup")
 
-
-@app.route('/signup', methods=['POST'])
-def signup_post():
+    flash('Error msg test', 'error')
     return render_template('signup.html', title="Blogz - Signup")
 
 
 @app.route('/logout')
 def logout():
+    flash('Logged out')
     del session['username']
     return redirect('/blog')
 
