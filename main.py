@@ -1,5 +1,6 @@
 from flask import Flask, request, redirect, render_template, flash, session
 from flask_sqlalchemy import SQLAlchemy
+import re
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -36,29 +37,44 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['index', 'blog_list', 'login', 'signup']
+    allowed_routes = ['static', 'index', 'blog_list', 'login', 'signup']
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
 
-@app.route('/blog', methods=['GET'])
+@app.route('/blog')
 def blog_list():
     return render_template('blog.html', title="Blogz")
 
 
-@app.route('/newpost', methods=['POST', 'GET'])
+@app.route('/newpost')
 def newpost():
-    return render_template('newpost.html', title="Blogz")
+    return render_template('newpost.html', title="Blogz - New Post")
 
 
-@app.route('/login', methods=['POST', 'GET'])
+@app.route('/newpost', methods=['POST'])
+def newpost_post():
+    return render_template('newpost.html', title="Blogz - New Post")
+
+
+@app.route('/login')
 def login():
-    return render_template('login.html', title="Blogz")
+    return render_template('login.html', title="Blogz - Login")
 
 
-@app.route('/signup', methods=['POST', 'GET'])
+@app.route('/login', methods=['POST'])
+def login_post():
+    return render_template('login.html', title="Blogz - Login")
+
+
+@app.route('/signup')
 def signup():
-    return render_template('signup.html', title="Blogz")
+    return render_template('signup.html', title="Blogz - Signup")
+
+
+@app.route('/signup', methods=['POST'])
+def signup_post():
+    return render_template('signup.html', title="Blogz - Signup")
 
 
 @app.route('/logout')
@@ -69,7 +85,7 @@ def logout():
 
 @app.route('/')
 def index():
-    return render_template('index.html', title="Blogz")
+    return render_template('index.html', title="Blogz - Users")
 
 
 if __name__ == '__main__':
