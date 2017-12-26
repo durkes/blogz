@@ -64,8 +64,22 @@ def login():
     if request.method == 'GET':
         return render_template('login.html', pg_title=pg_title)
 
-    flash('Error msg test', 'error')
-    return render_template('login.html', pg_title=pg_title)
+    # POST
+    username = request.form['username']
+    password = request.form['password']
+
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        flash('Username does not exist', 'error')
+        return render_template('login.html', pg_title=pg_title, username=username)
+
+    if user.password == password:
+        session['username'] = username
+        flash("Logged in")
+        return redirect('/newpost')
+
+    flash('Incorrect password', 'error')
+    return render_template('login.html', pg_title=pg_title, username=username)
 
 
 @app.route('/signup', methods=['POST', 'GET'])
@@ -75,7 +89,7 @@ def signup():
     if request.method == 'GET':
         return render_template('signup.html', pg_title=pg_title)
 
-    # POST request:
+    # POST
     username = request.form['username']
     password = request.form['password']
     verify = request.form['verify']
