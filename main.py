@@ -30,7 +30,7 @@ class User(db.Model):
     password = db.Column(db.String(120))
     blogs = db.relationship('Blog', backref='owner')
 
-    def __init__(self, email, password):
+    def __init__(self, username, password):
         self.username = username
         self.password = password
 
@@ -44,33 +44,89 @@ def require_login():
 
 @app.route('/blog')
 def blog_list():
-    return render_template('blog.html', title="Blogz - All Posts")
+    return render_template('blog.html', pg_title="Blogz - All Posts")
 
 
 @app.route('/newpost', methods=['POST', 'GET'])
 def newpost():
-    if request.method == 'GET':
-        return render_template('newpost.html', title="Blogz - New Post")
+    pg_title="Blogz - New Post"
 
-    return render_template('newpost.html', title="Blogz - New Post")
+    if request.method == 'GET':
+        return render_template('newpost.html', pg_title=pg_title)
+
+    return render_template('newpost.html', pg_title=pg_title)
 
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
+    pg_title="Blogz - Login"
+
     if request.method == 'GET':
-        return render_template('login.html', title="Blogz - Login")
+        return render_template('login.html', pg_title=pg_title)
 
     flash('Error msg test', 'error')
-    return render_template('login.html', title="Blogz - Login")
+    return render_template('login.html', pg_title=pg_title)
 
 
 @app.route('/signup', methods=['POST', 'GET'])
 def signup():
-    if request.method == 'GET':
-        return render_template('signup.html', title="Blogz - Signup")
+    pg_title="Blogz - Signup"
 
-    flash('Error msg test', 'error')
-    return render_template('signup.html', title="Blogz - Signup")
+    if request.method == 'GET':
+        return render_template('signup.html', pg_title=pg_title)
+
+    # POST request:
+    username = request.form['username']
+    password = request.form['password']
+    verify = request.form['verify']
+
+    error = False
+    username_error = ""
+    password_error = ""
+    verify_error = ""
+
+    if len(username) < 3 or len(username) > 20:
+        error = True
+        username_error = "Must be between 3-20 chars"
+
+    if re.match("^[\w-]*$", username) == None:
+        error = True
+        username_error = "Only use alphanumeric chars"
+
+    if len(password) < 3 or len(password) > 20:
+        error = True
+        password_error = "Must be between 3-20 chars"
+
+    if re.match("^[\S-]*$", password) == None:
+        error = True
+        password_error = "Do not use spaces"
+
+    if verify != password:
+        error = True
+        verify_error = "Passwords don't match"
+
+    # Input error
+    if error:
+        return render_template('signup.html', pg_title=pg_title,
+            username=username,
+            username_error=username_error,
+            password_error=password_error,
+            verify_error=verify_error)
+
+    existing_user = User.query.filter_by(username=username).first()
+    if not existing_user:
+        # success!
+        new_user = User(username, password)
+        db.session.add(new_user)
+        db.session.commit()
+        session['username'] = username
+        return redirect('/newpost')
+
+    # Username taken
+    username_error = "Username already exists"
+    return render_template('signup.html', pg_title=pg_title,
+        username=username,
+        username_error=username_error)
 
 
 @app.route('/logout')
@@ -82,7 +138,7 @@ def logout():
 
 @app.route('/')
 def index():
-    return render_template('index.html', title="Blogz - Users")
+    return render_template('index.html', pg_title="Blogz - Users")
 
 
 if __name__ == '__main__':
