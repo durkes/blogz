@@ -11,7 +11,6 @@ app.secret_key = 'x737kJcyz&zP3T'
 
 
 class Blog(db.Model):
-
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(240))
     body = db.Column(db.String(2400))
@@ -24,7 +23,6 @@ class Blog(db.Model):
 
 
 class User(db.Model):
-
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), unique=True)
     password = db.Column(db.String(120))
@@ -152,7 +150,8 @@ def logout():
 
 @app.route('/')
 def index():
-    return render_template('index.html', pg_title="Blogz - Users")
+    users = User.query.all()
+    return render_template('index.html', pg_title="Blogz - Users", users=users)
 
 
 if __name__ == '__main__':
