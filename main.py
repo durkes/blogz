@@ -35,13 +35,18 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['static', 'index', 'blog_list', 'login', 'signup']
+    allowed_routes = ['static', 'index', 'blog_pg', 'login', 'signup']
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
 
 @app.route('/blog')
-def blog_list():
+def blog_pg():
+    id = request.args.get('id')
+    if id is not None:
+        entry = Blog.query.filter_by(id=id).first()
+        return render_template('blog.html', pg_title=entry.title, entry=entry)
+
     return render_template('blog.html', pg_title="Blogz - All Posts")
 
 
@@ -52,7 +57,18 @@ def newpost():
     if request.method == 'GET':
         return render_template('newpost.html', pg_title=pg_title)
 
-    return render_template('newpost.html', pg_title=pg_title)
+    title = request.form['title']
+    body = request.form['body']
+
+    if len(title) == 0 or len(body) == 0:
+        flash('Must input Title and Content', 'error')
+        return render_template('newpost.html', pg_title=pg_title, title=title, body=body)
+
+    user = User.query.filter_by(username=session['username']).first()
+    new_entry = Blog(title, body, user)
+    db.session.add(new_entry)
+    db.session.commit()
+    return redirect('/blog?id=' + str(new_entry.id))
 
 
 @app.route('/login', methods=['POST', 'GET'])
