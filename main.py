@@ -47,7 +47,15 @@ def blog_rt():
         entry = Blog.query.filter_by(id=id).first()
         return render_template('blog.html', pg_title=entry.title, entry=entry)
 
-    return render_template('blog.html', pg_title="Blogz - All Posts")
+    user = request.args.get('user')
+    if user is not None:
+        userq = User.query.filter_by(username=user).first()
+        entries = Blog.query.filter_by(owner_id=userq.id).all()
+        return render_template('blog.html', pg_title="Blogz - All Posts by " + user, entries=entries)
+
+    # show all
+    entries = Blog.query.all()
+    return render_template('blog.html', pg_title="Blogz - All Posts", entries=entries)
 
 
 @app.route('/newpost', methods=['POST', 'GET'])
