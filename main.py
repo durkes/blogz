@@ -35,13 +35,13 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['static', 'index', 'blog_pg', 'login', 'signup']
+    allowed_routes = ['static', 'index', 'blog_rt', 'login', 'signup']
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
 
 @app.route('/blog')
-def blog_pg():
+def blog_rt():
     id = request.args.get('id')
     if id is not None:
         entry = Blog.query.filter_by(id=id).first()

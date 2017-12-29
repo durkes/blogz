@@ -5,7 +5,7 @@
 {% if entry %}
   <h2 class="post-title">{{entry.title}}</h2>
   <p class="post-body">{{entry.body}}</p>
-  <p class="post-author">written by <a href="/blog?user={{entry.username}}">{{entry.username}}</a></p>
+  <p class="post-author">written by <a href="/blog?user={{entry.owner.username}}">{{entry.owner.username}}</a></p>
 {% else %}
   <h1>blog posts!</h1>
 
@@ -15,7 +15,7 @@
     {% for entry in entries %}
       <h2><a href="/blog?id={{entry.id}}">{{entry.title}}</a></h2>
       <p>{{entry.body}}</p>
-      <p class="post-author">written by <a href="/blog?user={{entry.username}}">{{entry.username}}</a></p>
+      <p class="post-author">written by <a href="/blog?user={{entry.owner.username}}">{{entry.owner.username}}</a></p>
     {% endfor %}
   {% endif %}
 {% endif %}
